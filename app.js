@@ -1,7 +1,9 @@
 const express = require("express");
 const exphbs = require("express-handlebars");
 const morgan = require("morgan");
+const methodOverride = require("method-override")
 const app = express();
+
 
 app.engine("handlebars", exphbs({defaultLayout: "main"}));
 app.set("view engine", "handlebars");

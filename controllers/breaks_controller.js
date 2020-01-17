@@ -1,21 +1,24 @@
-const RawSchema = require('../database/schemas/rawBreakSchema')
+ const RawModel = require('../database/models/rawbreaks_model')
+
+ async function index(req, res){ 
+     RawModel.find()
+     .then(rawdatas => { 
+         return console.log(rawdatas)
+     })
+ }
 
 async function create(req,  res){ 
+    //destructures the request
     let { start, end, date, employeename, floaters} = req.body;
+    let rawdatabreak = { start, end, date, employeename, floaters}
 
-    let rawbreak = await RawSchema.create({start, end, date, employeename, floaters}).catch(err => res.status(500).send(err))
-
+    //Rawmodel is created by mongodb through a callback function in rawbreaks_model.js (its based off the schema defined in rawbreaks_schema)
+    RawModel.create(rawdatabreak).then(rawdatabreak => console.log(rawdatabreak)).catch(err => res.status(500).send(err))
 }
 
-async function update(req, res){ 
 
-}
-async function destroy(req, res){ 
-
-}
 
 module.exports = { 
     create, 
-    update, 
-    destroy
+    index
 }
