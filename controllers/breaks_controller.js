@@ -1,6 +1,7 @@
  const RawModel = require('../database/models/rawbreaks_model')
 
  async function index(req, res){ 
+     console.log(res)
      RawModel.find()
      .then(rawdatas => { 
          return console.log(rawdatas)
