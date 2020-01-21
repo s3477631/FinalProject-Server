@@ -19,11 +19,6 @@ app.use(require("./routes"));
 app.use(express.static("public"));
 
 // cors origin URL - Allow inbound traffic from origin
-corsOptions = {
-    origin: "http://localhost:3001/",
-    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-  };
-  app.use(cors(corsOptions));
 
 
 app.use(require("./middleware/error_handler_middleware"));
