@@ -6,8 +6,8 @@
   "scripts": {
     "test": "jest --coverage",
     "seed": "node database/seeds",
-    "dev-server": "index.js",
-    "start": "index.js"
+    "dev-server": "./database/index.js",
+    "start": "./database/connect.js index.js"
   },
   "author": "",
   "license": "ISC",
