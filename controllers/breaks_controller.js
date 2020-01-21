@@ -13,6 +13,7 @@ async function create(req,  res){
 
     //Rawmodel is created by mongodb through a callback function in rawbreaks_model.js (its based off the schema defined in rawbreaks_schema)
     RawModel.create(rawdatabreak).then(rawdatabreak => console.log(rawdatabreak)).catch(err => res.status(500).send(err))
+    res.send("Created")
 }
 
 
