@@ -7,7 +7,7 @@
     "test": "jest --coverage",
     "seed": "node database/seeds",
     "dev-server": "nodemon index.js",
-    "server": "forever -c \"nodemon --exitcrash -L\" index.js"
+    "start": "forever -c \"nodemon --exitcrash -L\" index.js"
   },
   "author": "",
   "license": "ISC",
