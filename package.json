@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --coverage",
-    "seed": "node database/seeds",
-    "dev-server": "nodemon index.js",
+    "build": "index.js",
     "start": "index.js"
   },
   "author": "",
