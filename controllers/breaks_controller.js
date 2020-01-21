@@ -3,9 +3,7 @@
  async function index(req, res){ 
      console.log(res)
      RawModel.find()
-     .then(rawdatas => { 
-         return console.log(rawdatas)
-     })
+     .then(rawdatas => res.send(rawdatas))
  }
 
 async function create(req,  res){ 

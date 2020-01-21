@@ -4,7 +4,7 @@ const BreaksController = require("../controllers/breaks_controller");
 
 //RETURNS ALL RECORDS FROM DATABASE
 router.get('/', function(req, res){ 
-    BreaksController.index()
+    BreaksController.index(req,res)
 })
 //CREATES NEW RAW RECORD:
 
