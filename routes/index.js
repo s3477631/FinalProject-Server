@@ -13,5 +13,8 @@ router.post('/upload', function(req, res){
     BreaksController.create(req, res)
 })
 
+router.get('/csv', function(req, res){
+    BreaksController.createFromCsv(req, res)
+})
 
 module.exports = router;

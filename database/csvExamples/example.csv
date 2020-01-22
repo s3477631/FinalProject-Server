@@ -1,12 +1,11 @@
-Shift Start,Shift End,Hours,Paid,,Breaks
-10:00 AM,6:30 PM,8.5,8,,30 | 15 | 15
-8:30 AM,2:30 PM,6,5.5,,30 | 15
-9:15 AM,5:15 PM,8,,,
-9:30 AM,3:45 PM,6.25,,,
-10:00 AM,6:00 PM,8.5,,,
-10:30 AM,5:30 PM,7.5,,,
-10:45 AM,6:00 PM,8,,,
-11:00 AM,6:15 PM,7.5,,,
-11:00 AM,4:00 PM,5,,,
-11:30 AM,6:00 PM,7.5,,,
-1:30 PM,6:30 PM,5,,,
+`Job,CoWorker,Shift Start,Shift End
+R4,Coworker 1,8:30 AM,4:30 PM
+E3,Coworker 2,9:15 AM,5:45 PM
+R5,Coworker 3,10:00 AM,3:00 PM
+F,Coworker 4,9:30 AM,4:00 PM
+R4,Coworker 5,10:00 AM,5:45 PM
+R6,Coworker 6,11:00 AM,5:15 PM
+PM F,Coworker 7,2:30 PM,9:30 PM
+E3,Coworker 8,1:30 PM,9:15 PM
+R5,Coworker 9,5:30 PM,9:30 PM
+E4,Coworker 10,5:30 PM,10:30 PM`

@@ -2,15 +2,7 @@ const mongoose = require ("mongoose")
 const BreakSchema = require("./transformedBreaks_schema")
 
 const rawSchema = new mongoose.Schema({ 
-    start: { 
-        type: Number, 
-        required: true
-    },
-    end: { 
-        type: Number, 
-        required: true
-    },
-    date: { 
+    job: { 
         type: String, 
         required: true
     },
@@ -18,9 +10,18 @@ const rawSchema = new mongoose.Schema({
         type: String, 
         required: true
     }, 
+    start: { 
+        // string is temp, will change back to number once sorted
+        type: String, 
+        required: true
+    },
+    end: { 
+        // string is temp, will change back to number once sorted
+        type: String, 
+        required: true
+    },
     floaters: { 
         type: Number, 
-        required: true
     },
     breaks: [BreakSchema]
 })
