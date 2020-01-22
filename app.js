@@ -5,6 +5,7 @@ const methodOverride = require("method-override")
 const app = express();
 
 
+
 app.engine("handlebars", exphbs({defaultLayout: "main"}));
 app.set("view engine", "handlebars");
 
@@ -16,6 +17,7 @@ app.use(morgan("combined"));
 app.use(require("./routes"));
 
 app.use(express.static("public"));
+
 
 app.use(require("./middleware/error_handler_middleware"));
 
