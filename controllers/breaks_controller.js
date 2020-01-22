@@ -16,9 +16,15 @@ async function create(req,  res){
     res.send("Created")
 }
 
+async function show(req, res){ 
+    RawModel.find({"date": `${req.body.date}`})
+    .then(outputs => res.send(outputs))
+}
+
 
 
 module.exports = { 
     create, 
-    index
-}
+    index, 
+    show
+}   

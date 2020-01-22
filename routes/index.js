@@ -13,5 +13,10 @@ router.post('/upload', function(req, res){
     BreaksController.create(req, res)
 })
 
+router.get('/today', function(req, res){ 
+    BreaksController.show(req, res)
+})
+
+
 
 module.exports = router;
