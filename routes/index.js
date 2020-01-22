@@ -13,7 +13,7 @@ router.post('/upload', function(req, res){
     BreaksController.create(req, res)
 })
 
-router.get('/today', function(req, res){ 
+router.post('/today', function(req, res){ 
     BreaksController.show(req, res)
 })
 
