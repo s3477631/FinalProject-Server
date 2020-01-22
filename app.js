@@ -3,7 +3,7 @@ const exphbs = require("express-handlebars");
 const morgan = require("morgan");
 const methodOverride = require("method-override")
 const app = express();
-const cors = cors()
+const cors = require('cors')
 
 
 app.engine("handlebars", exphbs({defaultLayout: "main"}));
