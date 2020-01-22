@@ -17,10 +17,10 @@ async function create(req,  res){
 }
 
 async function show(req, res){ 
-    console.log(req.body)
-    let {date } = req.body
-        RawModel.find({"date": `${date}`})
-      .then(result => res.send(result))
+    let querydate = req.body
+    let {date} = querydate
+    RawModel.find({"date": `${date}`})
+    .then(result => res.send(result))
 }
 
 
