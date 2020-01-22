@@ -3,7 +3,7 @@ const exphbs = require("express-handlebars");
 const morgan = require("morgan");
 const methodOverride = require("method-override")
 const app = express();
-
+const cors = cors()
 
 
 app.engine("handlebars", exphbs({defaultLayout: "main"}));
@@ -14,6 +14,11 @@ app.use(express.json());
 
 app.use(morgan("combined"));
 
+app.use(
+    cors({
+      origin: "http://localhost:3000"
+    })
+  );
 app.use(require("./routes"));
 
 app.use(express.static("public"));
