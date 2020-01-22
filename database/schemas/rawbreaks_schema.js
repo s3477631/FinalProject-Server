@@ -1,5 +1,5 @@
 const mongoose = require ("mongoose")
-
+const BreakSchema = require("./transformedBreaks_schema")
 
 const rawSchema = new mongoose.Schema({ 
     start: { 
@@ -21,7 +21,8 @@ const rawSchema = new mongoose.Schema({
     floaters: { 
         type: Number, 
         required: true
-    }
+    },
+    breaks: [BreakSchema]
 })
 
 
