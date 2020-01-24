@@ -1,5 +1,5 @@
  const RawModel = require('../database/models/rawbreaks_model')
- const parseCsv = require('../helpers/csvTrans')
+ const parseCsv = require('../helpers/csvHelper')
 
 
  async function index(req, res){ 
@@ -18,6 +18,13 @@ async function create(req,  res){
         res.send("Created") 
     }).catch(err => res.status(500).send(err))
    
+}
+
+async function make(startend){ 
+    // let transformed = new Map(parseCsv)
+        console.log(startend)
+
+//    RawModel.create()
 }
 
 
@@ -55,5 +62,6 @@ module.exports = {
     create, 
     index, 
     show,
+    make,
     createFromCsv
 }   

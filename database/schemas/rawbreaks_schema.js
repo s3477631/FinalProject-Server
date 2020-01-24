@@ -1,5 +1,5 @@
 const mongoose = require ("mongoose")
-const BreakSchema = require("./transformedBreaks_schema")
+// const BreakSchema = require("./transformedBreaks_schema")
 
 const rawSchema = new mongoose.Schema({ 
     start: { 
@@ -12,17 +12,17 @@ const rawSchema = new mongoose.Schema({
     },
     date: { 
         type: String, 
-        required: true
+        // required: true
     },
     employeename: { 
         type: String, 
-        required: true
+        // required: true
     }, 
     floaters: { 
         type: Number, 
-        required: true
+        // required: true
     },
-    breaks: [BreakSchema]
+    // breaks: [BreakSchema]
 })
 
 

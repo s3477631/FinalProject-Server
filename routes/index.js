@@ -2,9 +2,9 @@ const express = require("express");
 const router = express.Router();
 const BreaksController = require("../controllers/breaks_controller");
 const multer = require('multer')
-const csvTrans = require('../helpers/csvTrans')
+const parseCsv = require('../helpers/csvHelper')
 const fs = require("fs")
-
+const TimeFormat = require('hh-mm-ss')
 const storage = multer.diskStorage({ 
     destination: function(req, file, cb){ 
         cb(null, './uploads/'); 
@@ -32,12 +32,14 @@ router.post('/today', function(req, res){
 })
 
 router.post('/csvupload', upload.single('csvFile'), function(req, res){ 
-  
     fs.readFile(req.file.path, function(err, data) {
-        res.writeHead(200, {'Content-Type': 'text/csv'});
-        res.write(data);
+        
+         res.writeHead(200, {'Content-Type': 'text/csv'});
+        //  console.log(res.write(data))
+        parseCsv(data)
         res.end();
       });
+    
 })
 
 router.get('/csv', function(req, res){
