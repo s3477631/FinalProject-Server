@@ -19,6 +19,7 @@ async function parseCsv(data) {
 }
 
 async function correctFormat(endresult) {
+
     let construct = endresult.data;
     let startend = {
         start:[],
@@ -27,8 +28,8 @@ async function correctFormat(endresult) {
 
     for(i = 1; i < construct.length - 1; i++) {
         //splits the start and end times and pushes to object array
-        startend.start.push(construct[i][0])
-        startend.end.push(construct[i][1])
+        startend.start.push(construct[i][2])
+        startend.end.push(construct[i][3])
     } 
 
     let outter = startend.end
@@ -41,8 +42,6 @@ async function correctFormat(endresult) {
 }
 
 async function runtest(outter, inner) {
-
-
     let convertstart = []
     let convertend = []
     //mapping the end times, converting to 24 hour time and converring to seconds
