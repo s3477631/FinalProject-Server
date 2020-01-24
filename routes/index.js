@@ -38,8 +38,7 @@ router.post('/csvupload', upload.single('csvFile'), function(req, res){
         //  console.log(res.write(data))
         parseCsv(data)
         res.end();
-    });
-    
+    }); 
 })
 
 router.get('/csv', function(req, res){
