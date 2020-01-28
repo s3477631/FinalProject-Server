@@ -34,6 +34,7 @@ async function show(req, res){
     RawModel.find({"date": `${date}`})
     .then(result => res.send(result))
 }
+
 async function createFromCsv(req, res) {
     let result = parseCsv()
 
