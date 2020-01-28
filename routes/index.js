@@ -31,12 +31,13 @@ router.post('/today', function(req, res){
     BreaksController.show(req, res)
 })
 
-router.post('/csvupload', upload.single('csvFile'), function(req, res){ 
-    fs.readFile(req.file.path, function(err, data) {
+router.post('/csvupload', upload.single('csvFile'), function(req, res){     
+    fs.readFile(req.file.path, async function(err, data) {
         
          res.writeHead(200, {'Content-Type': 'text/csv'});
         //  console.log(res.write(data))
-        parseCsv(data)
+        let duration = await parseCsv(data)     
+        return duration
         res.end();
       });
     
