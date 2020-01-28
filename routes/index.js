@@ -34,13 +34,12 @@ router.post('/today', function(req, res){
 router.post('/csvupload', upload.single('csvFile'), function(req, res){     
     fs.readFile(req.file.path, async function(err, data) {
         
-         res.writeHead(200, {'Content-Type': 'text/csv'});
+        res.writeHead(200, {'Content-Type': 'text/csv'});
         //  console.log(res.write(data))
         let duration = await parseCsv(data)     
         return duration
         res.end();
-      });
-    
+    }); 
 })
 
 router.get('/csv', function(req, res){
