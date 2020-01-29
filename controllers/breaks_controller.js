@@ -1,4 +1,4 @@
- const RawModel = require('../database/models/rawbreaks_model')
+ const TimeSheet = require('../database/models/timesheet_model')
  const parseCsv = require('../helpers/csvHelper')
 
 
@@ -43,7 +43,7 @@ async function createFromCsv(req, res, data) {
 }
 
 async function createFromData(employeeObject, index) {
-    await RawModel.create(employeeObject.job, employeeObject.name, employeeObject.startTime, employeeObject.endTime)
+    await TimeSheet.create(employeeObject.job, employeeObject.name, employeeObject.startTime, employeeObject.endTime)
         .then(console.log('success'))
         .catch(err => console.log(err))
 
