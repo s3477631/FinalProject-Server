@@ -1,4 +1,4 @@
- const RawModel = require('../database/models/rawbreaks_model')
+ const RawModel = require('../database/models/timesheet_model')
  const parseCsv = require('../helpers/csvHelper')
 
 
