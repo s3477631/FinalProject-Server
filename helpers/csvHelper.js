@@ -4,14 +4,15 @@ const decoder = new StringDecoder('utf8');
 
 function parseCsv(data) {
 
-  // console.log(data)
+    // console.log(data)
     const output = Buffer.from(data);
-  //parses the data from a data buffer to a string
+    //parses the data from a data buffer to a string
     let result = decoder.write(output)
-//Papa parse converts the data to json
+    //Papa parse converts the data to json
     let endresult = Papa.parse(result)
     let employeeObjectArray = []
-//Returns raw CSV data
+    
+    //Returns raw CSV data
     employeeObjectArray.push(endresult.data.map(getDateObjects))
     return employeeObjectArray
 }  
@@ -31,7 +32,6 @@ function getDateObjects(item, index) {
 }
 
 function getEmployeeObject(item, start, end) {
-
     let employee = {
         job: item[0],
         name: item[1],
