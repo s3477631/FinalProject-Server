@@ -25,7 +25,6 @@ function getDateObjects(item, index) {
 
     let start = new Date(startNum)
     let end = new Date(endNum)
-    // console.log(`${start.getHours()} ${start.getMinutes()}`)
     if (index > 0) {
         return getEmployeeObject(item, start, end)
     } 
