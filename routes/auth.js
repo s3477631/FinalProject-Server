@@ -5,7 +5,7 @@ const AuthController = require("../controllers/Auth_controller")
 
 router.post("/register", celebrate({
     body: {
-        username: Joi.string().required(),
+        email: Joi.string().email().required(),
         password: Joi.string().required()
     }
 }), AuthController.register)

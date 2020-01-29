@@ -7,6 +7,6 @@ const UserSchema = new Schema({
     breaks: [TimeSheet]
 })
 
-UserSchema.plugin(passportLocalMongoose, { usernameField: 'username'})
+UserSchema.plugin(passportLocalMongoose, { usernameField: 'email'})
 
 module.exports = UserSchema
