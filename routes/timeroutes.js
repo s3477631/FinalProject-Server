@@ -25,9 +25,8 @@ router.post('/csv', upload.single('csvFile'), function(req, res){
         
         res.writeHead(200, {'Content-Type': 'text/csv'});
         //  console.log(res.write(data))
-        let duration = await parseCsv(data)     
-        return duration
-        res.end();
+        BreaksController.createFromCsv(req, res, data)
+        res.end()
     }); 
 })
 
