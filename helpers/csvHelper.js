@@ -1,104 +1,47 @@
 const Papa = require('papaparse')
 const { StringDecoder } = require('string_decoder')
-const TimeFormat = require('hh-mm-ss')
 const decoder = new StringDecoder('utf8');
 
+function parseCsv(data) {
 
-
-async function parseCsv(data) {
-    // console.log(data)
+  // console.log(data)
     const output = Buffer.from(data);
-    //parses the data from a data buffer to a string
+  //parses the data from a data buffer to a string
     let result = decoder.write(output)
-    //Papa parse converts the data to json
+//Papa parse converts the data to json
     let endresult = Papa.parse(result)
-     //needs to be formatted & converted to seconds
-    console.log(endresult)
-
-   return correctFormat(endresult)
-}
-
-async function correctFormat(endresult) {
-
-    let construct = endresult.data;
-    let startend = {
-        start:[],
-        end:[]
-    }
-
-    for(i = 1; i < construct.length - 1; i++) {
-        //splits the start and end times and pushes to object array
-        startend.start.push(construct[i][2])
-        startend.end.push(construct[i][3])
-    } 
-
-    let outter = startend.end
-    let inner = startend.start
-
-    outter.pop()
-
-    runtest(outter, inner)
-
-}
-
-async function runtest(outter, inner) {
-    let convertstart = []
-    let convertend = []
-    //mapping the end times, converting to 24 hour time and converring to seconds
-    outter.map((currElement) => {
+    let employeeObjectArray = []
+//Returns raw CSV data
+    employeeObjectArray.push(endresult.data.map(getDateObjects))
+    return employeeObjectArray
+}  
  
-        if(currElement.slice(0, -3).trim().length == 4) { 
+function getDateObjects(item, index) {
+    var today = new Date();
+    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
 
-            if(currElement.slice(-2)== "PM"){
-                convertstart.push(`${parseInt(currElement) + 12}:00`)
-            }
-            else { 
-            convertstart.push(`${0}` + (currElement.slice(0, -3).trim()))
-            }
-        }
-        else if(currElement.slice(0, -3).trim().length == 5){
+    let startNum = Date.parse(`${date} ${item[2]}`)
+    let endNum = Date.parse(`${date} ${item[3]}`)
 
-            if(currElement.slice(-2)== "PM"){
-                convertstart.push(parseInt(currElement) + 12)
-            }
-            else { 
-                convertstart.push(currElement.slice(0, -3).trim())
-            }
-        }
-    })
-
-    inner.map((currElement) => {
-    
-        if(currElement.slice(0, -3).trim().length == 4){ 
-            if(currElement.slice(-2)== "PM"){
-                convertend.push(`${parseInt(currElement) + 12}:00`)
-            }
-            else { 
-                convertend.push(`${0}` + (currElement.slice(0, -3).trim()))
-            }
-        }
-        else if(currElement.slice(0, -3).trim().length == 5){
-            if(currElement.slice(-2)== "PM"){
-                convertend.push(parseInt(currElement) + 12)
-            }
-            else { 
-                convertend.push(currElement.slice(0, -3).trim())
-            }
-        }
-    })
-    
-    runNext(convertend, convertstart)
+    let start = new Date(startNum)
+    let end = new Date(endNum)
+    // console.log(`${start.getHours()} ${start.getMinutes()}`)
+    if (index > 0) {
+        return getEmployeeObject(item, start, end)
+    } 
 }
 
-function runNext(convertend, convertstart) {
+function getEmployeeObject(item, start, end) {
 
-    for (let z of convertstart){
-        console.log("end " + TimeFormat.toS(z))
+    let employee = {
+        job: item[0],
+        name: item[1],
+        startTime: start,
+        endTime: end,
     }
 
-    for (let i of convertend){
-        console.log("start " + TimeFormat.toS(i))
-    }
+    return employee
 }
 
 module.exports = parseCsv
+
