@@ -16,7 +16,7 @@ app.use(morgan("combined"));
 
 app.use(
     cors({
-      origin: "http://localhost:3000"
+      origin: "https://boiling-inlet-28252.herokuapp.com"
     })
   );
 app.use(require("./routes"));
