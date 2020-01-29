@@ -38,19 +38,9 @@ async function show(req, res){
 async function createFromCsv(req, res, data) {
 
     let employeeObjectArray = await parseCsv(data)
-    console.log(employeeObjectArray)
-    await employeeObjectArray.map(createFromData)
-    
-
-
-}
-
-async function createFromData(employeeObject, index) {
-    await TimeSheet.create(employeeObject.job, employeeObject.name, employeeObject.startTime, employeeObject.endTime)
-        .then(console.log('success'))
-        .catch(err => console.log(err))
-
-    console.log(employeeObject)
+        employeeObjectArray.map((timevalues) => {
+            TimeSheet.create(timevalues)
+        })
 }
 
 

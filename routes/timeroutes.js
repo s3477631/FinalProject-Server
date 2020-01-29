@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const multer = require('multer')
-const parseCsv = require('../helpers/csvHelper')
+const BreaksController = require("../controllers/breaks_controller")
 const fs = require('fs')
 
 const storage = multer.diskStorage({ 
