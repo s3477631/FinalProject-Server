@@ -9,8 +9,13 @@ router.post("/register", celebrate({
         password: Joi.string().required()
     }
 }), AuthController.register)
-// router.use(
-//   "/bookmarks",
-//   passport.authenticate("jwt", { session: false })
+
+router.post("/login", celebrate({
+    body: { 
+        email: Joi.string().required(), 
+        password: Joi.string().required()
+    }
+}), AuthController.login)
+
 
 module.exports = router

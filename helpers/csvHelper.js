@@ -9,10 +9,10 @@ function parseCsv(data) {
   //parses the data from a data buffer to a string
     let result = decoder.write(output)
 //Papa parse converts the data to json
-    let endresult = Papa.parse(result)
+    let jsonconversion = Papa.parse(result).data
     let employeeObjectArray = []
 //Returns raw CSV data
-    employeeObjectArray.push(endresult.data.map(getDateObjects))
+    employeeObjectArray.push(jsonconversion.map(getDateObjects))
     return employeeObjectArray
 }  
  
@@ -25,7 +25,6 @@ function getDateObjects(item, index) {
 
     let start = new Date(startNum)
     let end = new Date(endNum)
-    // console.log(`${start.getHours()} ${start.getMinutes()}`)
     if (index > 0) {
         return getEmployeeObject(item, start, end)
     } 
