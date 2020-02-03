@@ -1,6 +1,6 @@
- const RawModel = require('../database/models/rawbreaks_model')
+ const TimeSheet = require('../database/models/timesheet_model')
  const parseCsv = require('../helpers/csvHelper')
-
+ const testinger = require('../helpers/calculationsHelper')
 
  async function index(req, res){ 
      console.log(res)
@@ -34,28 +34,16 @@ async function show(req, res){
     RawModel.find({"date": `${date}`})
     .then(result => res.send(result))
 }
-async function createFromCsv(req, res) {
-    let result = parseCsv()
 
-    let indexCount = 1
-    
-    let job = result.data[indexCount][0].trim()
-    let employeename = result.data[indexCount][1].trim()
-    let start = result.data[indexCount][2].trim()
-    let end = result.data[indexCount][3].trim()
-    let floaters = 0
+async function createFromCsv(req, res, data) {
 
-
-    let rawdata = { job, employeename, start, end,  floaters }
-    
-    await RawModel.create(rawdata)
-        .then(rawdata => console.log(rawdata))
-        .catch(err => res.status(500).send(err))
-
-    res.send(rawdata)
+    let employeeObjectArray = await parseCsv(data)
+        employeeObjectArray.map((timevalues) => {
+            TimeSheet.create(timevalues)
+        })
+    let calculations = await parseCsv(data)
+    return testinger(calculations)
 }
-
-
 
 
 module.exports = { 
