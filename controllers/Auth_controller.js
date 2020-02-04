@@ -10,8 +10,7 @@ const jwt = require('jsonwebtoken');
             if (err) {
                 return next(err);
             }
-    
-            res.send("hey");
+            res.send("you are authenticated!")
         });
     }
 
