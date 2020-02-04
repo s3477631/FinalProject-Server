@@ -4,28 +4,22 @@ const mongoose = require ("mongoose")
 const TimeSheet = new mongoose.Schema({ 
      name: { 
         type: String, 
-
     }, 
     startTime: { 
         type: String, 
-
     },
     endTime: { 
         type: String, 
-
     }, 
     duration: {
-        type: Number, 
-
+        type: String, 
     },
     job: {
         type: String, 
     },
-    breakNum: {
-        type: Number,
+    breaks: {
+        type: Array,
     }
 })
-
-
 
 module.exports =  TimeSheet

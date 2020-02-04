@@ -1,12 +1,12 @@
  const TimeSheet = require('../database/models/timesheet_model')
  const parseCsv = require('../helpers/csvHelper')
- const testinger = require('../helpers/calculationsHelper')
+ const { getShiftLength, getBreaks, getBreakSchedule, getFloaterCount } = require('../helpers/calculationsHelper')
 
- async function index(req, res){ 
-     console.log(res)
-     RawModel.find()
-     .then(rawdatas => res.send(rawdatas))
- }
+async function index(req, res){ 
+    console.log(res)
+    RawModel.find()
+    .then(rawdatas => res.send(rawdatas))
+}
 
 async function create(req,  res){ 
     //destructures the request
@@ -20,36 +20,38 @@ async function create(req,  res){
    
 }
 
-async function make(startend){ 
-    // let transformed = new Map(parseCsv)
-        console.log(startend)
-
-//    RawModel.create()
-}
-
-
 async function show(req, res){ 
     let querydate = req.body
     let {date} = querydate
     RawModel.find({"date": `${date}`})
-    .then(result => res.send(result))
+        .then(result => res.send(result))
 }
 
 async function createFromCsv(req, res, data) {
-
     let employeeObjectArray = await parseCsv(data)
-        employeeObjectArray.map((timevalues) => {
-            TimeSheet.create(timevalues)
-        })
-    let calculations = await parseCsv(data)
-    return testinger(calculations)
-}
 
+    employeeObjectArray.map((employeeObject, index) => {
+        if (index > 0) {
+            employeeObject.duration = getShiftLength(employeeObject)
+        }
+    })
+
+    employeeObjectArray.map((employeeObject, index) => {
+        if (index > 0) {
+            employeeObject.breaks = getBreaks(employeeObject.duration)
+        }
+    })
+
+    getBreakSchedule(employeeObjectArray)
+    employeeObjectArray.map((employeeObject) => {
+        // console.log(employeeObject)
+        TimeSheet.create(employeeObject)
+    })
+}
 
 module.exports = { 
     create, 
     index, 
     show,
-    make,
     createFromCsv
 }   
