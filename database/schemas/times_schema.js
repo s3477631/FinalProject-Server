@@ -17,8 +17,8 @@ const TimeSheet = new mongoose.Schema({
     job: {
         type: String, 
     },
-    breakNum: {
-        type: Number,
+    breaks: {
+        type: Array,
     }
 })
 
