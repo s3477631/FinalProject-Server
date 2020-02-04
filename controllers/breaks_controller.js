@@ -1,6 +1,6 @@
-const TimeSheet = require('../database/models/timesheet_model')
-const parseCsv = require('../helpers/csvHelper')
-
+ const TimeSheet = require('../database/models/timesheet_model')
+ const parseCsv = require('../helpers/csvHelper')
+ const testinger = require('../helpers/calculationsHelper')
 
 async function index(req, res){ 
     console.log(res)
@@ -29,15 +29,16 @@ async function show(req, res){
 
 async function createFromCsv(req, res, data) {
     let employeeObjectArray = await parseCsv(data)
-    employeeObjectArray.map((timevalues) => {
-        TimeSheet.create(timevalues)
-    })
+        employeeObjectArray.map((timevalues) => {
+            TimeSheet.create(timevalues)
+        })
+    let calculations = await parseCsv(data)
+    return testinger(calculations)
 }
 
 module.exports = { 
     create, 
     index, 
     show,
-    make,
     createFromCsv
 }   
