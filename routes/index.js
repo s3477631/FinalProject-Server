@@ -5,6 +5,6 @@ const AuthRoute = require("./auth")
 const TimeRoute = require('./timeroutes')
 
 router.use("/auth", AuthRoute)
-router.use("/upload", TimeRoute)
+router.use("/upload", passport.authenticate("jwt", { session: false }), TimeRoute)
 
 module.exports = router;
