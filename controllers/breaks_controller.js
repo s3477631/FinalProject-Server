@@ -1,6 +1,6 @@
  const TimeSheet = require('../database/models/timesheet_model')
  const parseCsv = require('../helpers/csvHelper')
- const { getShiftLength, getBreaks } = require('../helpers/calculationsHelper')
+ const { getShiftLength, getBreaks, getBreakSchedule, getFloaterCount } = require('../helpers/calculationsHelper')
 
 async function index(req, res){ 
     console.log(res)
@@ -42,8 +42,9 @@ async function createFromCsv(req, res, data) {
         }
     })
 
+    getBreakSchedule(employeeObjectArray)
     employeeObjectArray.map((employeeObject) => {
-        console.log(employeeObject)
+        // console.log(employeeObject)
         TimeSheet.create(employeeObject)
     })
 }
