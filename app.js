@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require("express");
 const exphbs = require("express-handlebars");
 const morgan = require("morgan");
@@ -17,9 +18,11 @@ app.use(express.json());
 app.use(morgan("combined"));
 
 app.use(
-    cors({
+    cors(
+      {
       origin: "http://localhost:3000"
-    })
+    }
+    )
   );
 app.use(require("./routes"));
 
