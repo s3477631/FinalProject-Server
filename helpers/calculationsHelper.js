@@ -114,7 +114,7 @@ function getBreakSchedule(employeeObjectArray) {
     breakSchedule = sortFirstFifteens(breakSchedule, floaters)
 
     // step 3: move 30 min breaks to start at 12 pm
-    breakSchedule = sortBigBreaks(breakSchedule)
+    breakSchedule = sortThirties(breakSchedule, floaters)
 
     // step 4: move 15 min breaks to start after the final 30 min break
     breakSchedule = sortSecondFifteens(breakSchedule)
@@ -137,34 +137,6 @@ function sortInAscendingOrder(breakSchedule) {
     return breakSchedule.sort((a, b) => a.startTime - b.startTime)
 }
 
-// account for overlaps
-// iterate through Array
-// if start time of previous element matches this element,
-// increase the start time if this element by the buffer + the duration of the previous element
-
-// need to know all the floaters and their shift times
-
-function accountForOverlaps(unsortedBreakSchedule, numFloaters) {
-    let buffer = 0
-    let sameCount = 0
-    unsortedBreakSchedule = unsortedBreakSchedule.map((thisBreak, index) => {
-        const previousBreak = unsortedBreakSchedule[index-1]
-        // only increase start time if same count >= num floaters *at this point in time*
-        // this indicates we're over capacity
-        // i.e. 3 breaks need to be done at the same time
-        // but we only have 2 floaters
-        if (previousBreak && previousBreak.startTime == thisBreak.startTime) {
-            // console.log(`Last break matches this one`)
-            thisBreak.startTime = thisBreak.startTime + buffer + previousBreak.duration
-            thisBreak.endTime = thisBreak.endTime + buffer + previousBreak.duration
-            buffer += previousBreak.duration
-        }
-        // console.log(thisBreak)
-        return thisBreak
-    })
-    return unsortedBreakSchedule
-}
-
 // new account for overlaps function
 function sortFirstFifteens(breakSchedule, floaters) {
     
@@ -172,6 +144,41 @@ function sortFirstFifteens(breakSchedule, floaters) {
 
         // skip 30's, they're out of order
         if (thisBreak.duration === 30) {
+            return thisBreak
+        }
+
+        // sort floaters by ascending nextAvailableTime
+        floaters.sort((a, b) => a.nextAvailableTime - b.nextAvailableTime)
+
+        // find the next available floater
+        let nextAvailableFloater = floaters[0]
+        let nextAvailableTime = nextAvailableFloater.nextAvailableTime
+
+        // adjust the start/end time of this break relative to nextAvailableTime
+        thisBreak.floaterNum = nextAvailableFloater.floaterNum
+        thisBreak.startTime = Math.max(thisBreak.startTime, nextAvailableTime)
+        thisBreak.endTime = thisBreak.startTime + thisBreak.duration
+
+        // since we have assigned this floater this break,
+        // their next available time will be when this break ends
+        nextAvailableFloater.nextAvailableTime = thisBreak.endTime
+
+        return thisBreak
+
+    })
+
+}
+
+function sortThirties(breakSchedule, floaters) {
+    
+    floaters.forEach(floater => {
+        floater.nextAvailableTime = 720
+    })
+
+    return breakSchedule.map((thisBreak) => {
+
+        // now ignore 15's
+        if (thisBreak.duration === 15) {
             return thisBreak
         }
 
@@ -196,7 +203,6 @@ function sortFirstFifteens(breakSchedule, floaters) {
     })
 
 }
-
 
 let last30EndTime = 0 // this line should reset or it may break on multiple uploads
 
