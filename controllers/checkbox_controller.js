@@ -1,5 +1,5 @@
 const AnalysisSheet = require('../database/models/analysis_model')
-
+var _ = require('lodash');
 
 async function starttimes(req, res){ 
 //sends datetime object back to the client (to be stored in local storage)
@@ -18,8 +18,11 @@ async function starttimes(req, res){
 async function endtimes(req, res) { 
     let time = Date.now() 
     let endtime = new Date(time)
-    let {starttimes} = req.body
-    AnalysisSheet.find(starttimes).then(response => console.log(response))
+    let output = req.body
+    AnalysisSheet.find(output, function(output){
+        
+    })
+
 
 }
 

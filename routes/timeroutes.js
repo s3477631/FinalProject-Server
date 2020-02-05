@@ -22,7 +22,6 @@ router.post('/csv',passport.authenticate("jwt", { session: false }), upload.sing
     fs.readFile(req.file.path, async function(err, data) {
                 //  console.log(res.write(data))
         BreaksController.createFromCsv(req, res, data)
-        res.end()
     }); 
 })
 

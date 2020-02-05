@@ -27,6 +27,7 @@
     "formidable": "^1.2.1",
     "hh-mm-ss": "^1.2.0",
     "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.15",
     "method-override": "^3.0.0",
     "mongoose": "^5.3.15",
     "morgan": "^1.9.1",
