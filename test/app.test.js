@@ -1,7 +1,7 @@
 require('dotenv').config()
 const chai = require('chai');
 var chaiHttp = require('chai-http');
-var server = require('../app');
+var server = require('../index');
 var should = chai.should();
 const JWT = require("jsonwebtoken")
 const fs = require('fs')
@@ -22,17 +22,15 @@ const expec = require('mocha')
 
 describe('test upload csv function', function() {
     it('should give back 200 response code', function(done) {
-        const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZTM5MGJhMDhhYzdlZTAwMmZiZGI0MGQiLCJpYXQiOjE1ODA4NjUwOTN9.LdhaK-sssILU87aatfI-1t92Mcnrf2fqjnsq5UE0O08"
         chai.request(server)
-          .post('/upload/csv')
-          .set("Authorization", `Bearer ${token}`)
-          .attach('csvFile',
+            .post('/upload/csv')
+            .set('authorization', "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZTNhMzgwZTRlODY3YzA1NDIyNjUwYmQiLCJpYXQiOjE1ODA4NzcxMDZ9.vZ_HjTkfDKcsZ4ZJfhQbjcWUH-kMGnfTcVLW7p_P9bo")
+            .attach('csvFile',
                 fs.readFileSync('./test/example.csv'),
                 'example.csv')
-          .end(function(err, res){
-            //   console.log(err)
-              console.log(res)
-              done()
-          });
-      });
+            .end(function(err, res){
+                res.should.have.status(200)
+                done()
+            });
+        });
 });
