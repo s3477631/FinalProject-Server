@@ -17,18 +17,13 @@ const storage = multer.diskStorage({
 
 const upload = multer({storage: storage}, ('/home/ghostcoder/Downloads/preview.png'))
 
-router.post('/csv',
-    passport.authenticate("jwt", { session: false }),
-    upload.single('csvFile'), function(req, res){
-        fs.readFile(req.file.path, async function(err, data) {
-            if (err) {
-                res.send(err)
-            }
-            res.writeHead(200, {'Content-Type': 'text/csv'});
-            //  console.log(res.write(data))
-            BreaksController.createFromCsv(req, res, data)
-            res.end()
-    })
+
+router.post('/csv',passport.authenticate("jwt", { session: false }), upload.single('csvFile'), function(req, res){     
+    fs.readFile(req.file.path, async function(err, data) {
+                //  console.log(res.write(data))
+        BreaksController.createFromCsv(req, res, data)
+        res.end()
+    }); 
 })
 
 module.exports = router
