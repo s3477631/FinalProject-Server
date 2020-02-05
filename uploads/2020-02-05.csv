@@ -1,11 +1,13 @@
-Job,CoWorker,Shift Start,Shift End
-R4,Coworker 1,8:30 AM,4:30 PM
-E3,Coworker 2,9:15 AM,5:45 PM
-R5,Coworker 3,10:00 AM,3:00 PM
-F,Coworker 4,9:30 AM,4:00 PM
-R4,Coworker 5,10:00 AM,5:45 PM
-R6,Coworker 6,11:00 AM,5:15 PM
-PM F,Coworker 7,2:30 PM,9:30 PM
-E3,Coworker 8,1:30 PM,9:15 PM
-R5,Coworker 9,5:30 PM,9:30 PM
-E4,Coworker 10,5:30 PM,10:30 PM
+﻿Job,CoWorker,Shift Start,Shift End
+R4,Sam,8:30 AM,3:30 PM
+E3,Lisa,9:15 AM,5:15 PM
+R5,Zach,9:45 AM,5:45 PM
+E4/CF,Devin,10:00 AM,5:30 PM
+R6,Ferdy,10:30 AM,4:00 PM
+R7,Matt,10:45 AM,6:15 PM
+E4,Jack,11:00 AM,6:30 PM
+F,Sarah,11:00 AM,5:30 PM
+R8,Phil,11:30 AM,6:30 PM
+R9,Connor,11:30 AM,7:30 PM
+E2,Mary,10:30 AM,6:30 PM
+R10,Jane,1:30 PM,6:30 PM

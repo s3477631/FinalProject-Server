@@ -53,6 +53,8 @@ function getBreakSchedule(employeeObjectArray) {
 
     let breakSchedule = []
 
+    console.log(getFloaters(employeeObjectArray))
+    
     employeeObjectArray.map((employeeObject, index) => {
         if (index > 0) {
             employeeObject.breaks.map((breakDuration, index) => {
@@ -92,6 +94,23 @@ function getBreakSchedule(employeeObjectArray) {
     // step 1: sort in ascending order of start time
     breakSchedule = sortInAscendingOrder(breakSchedule)
 
+    // sort first fifteens
+    // iterate through break schedule
+    // ignore 30 min breaks
+    // push 15 min breaks back according to availability
+
+    // move 30's 
+
+    // move 15's
+
+    //console.log("ascending order", breakSchedule)
+    // if you have too many 15 min breaks at the start
+    // and you account for overlap right at the end
+    // the halves will get pushed back past 12 pm
+    // so maybe account for overlaps twice
+    // once at the start
+    // and once at the end
+
     // step 2: account for overlaps given floater availability
     breakSchedule = accountForOverlaps(breakSchedule)
 
@@ -104,9 +123,17 @@ function getBreakSchedule(employeeObjectArray) {
     // step 5: finally, sort again in ascending order
     breakSchedule = sortInAscendingOrder(breakSchedule)
     
-    console.log(breakSchedule)
+    //console.log(displayAsDecimal(breakSchedule))
 }
 
+function displayAsDecimal(breakSchedule) {
+    return breakSchedule.map(breakData => {
+        breakData.startTime /= 60
+        breakData.endTime /= 60
+        return breakData
+    })
+}
+ 
 function sortInAscendingOrder(breakSchedule) {
     return breakSchedule.sort((a, b) => a.startTime - b.startTime)
 }
@@ -137,6 +164,40 @@ function accountForOverlaps(unsortedBreakSchedule, numFloaters) {
         return thisBreak
     })
     return unsortedBreakSchedule
+}
+
+// new account for overlaps function
+function sortFirstFifteens(breakSchedule, floaters) {
+    // iterate through break schedule
+    // if this break has an available floater, assign this break to a floater
+    // otherwise
+    let buffer = 0
+    let sameCount = 0
+    breakSchedule = breakSchedule.map((thisBreak, index) => {
+        const previousBreak = breakSchedule[index-1]
+        // only increase start time if same count >= num floaters *at this point in time*
+        // this indicates we're over capacity
+        // i.e. 3 breaks need to be done at the same time
+        // but we only have 2 floaters
+        if (previousBreak && previousBreak.startTime == thisBreak.startTime) {
+            // console.log(`Last break matches this one`)
+            thisBreak.startTime = thisBreak.startTime + buffer + previousBreak.duration
+            thisBreak.endTime = thisBreak.endTime + buffer + previousBreak.duration
+            buffer += previousBreak.duration
+        }
+        // console.log(thisBreak)
+        return thisBreak
+    })
+    return breakSchedule
+}
+
+function floaterIsAvailabile(time, floaters) {
+    // given a time, find whether there is a floater free to do this break
+    // need to know what breaks the floater is currently on
+    // iterate through floaters, return true if floater is free
+    // free meaning the passed time is between the floater's start and end time
+    // and they have finished their previous break
+    // store when they'll be next free
 }
 
 let last30EndTime = 0 // this line should reset or it may break on multiple uploads
@@ -186,6 +247,7 @@ function getFloaters(employeeObjectArray) {
                 let floaterObject = {...employeeObject}
                 floaterObject.startTime = getDateInMinutesSinceMidnight(floaterObject.startTime)
                 floaterObject.endTime = getDateInMinutesSinceMidnight(floaterObject.endTime)
+                floaterObject.nextAvailableTime = floaterObject.startTime
 
                 floaters.push(floaterObject)
             }
