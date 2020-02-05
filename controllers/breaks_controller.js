@@ -32,8 +32,7 @@ async function createFromCsv(req, res, data) {
     employeeObjectArray.map((employeeObject) => {
         TimeSheet.create(employeeObject)
     })
-    res.send(TimeSheet)
-
+    res.send(employeeObjectArray)
     employeeObjectArray.map((object, index) => {
         if (index > 0) {
             object.duration = getShiftLength(object)

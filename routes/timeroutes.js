@@ -20,9 +20,7 @@ const upload = multer({storage: storage})
 
 router.post('/csv',passport.authenticate("jwt", { session: false }), upload.single('csvFile'), function(req, res){     
     fs.readFile(req.file.path, async function(err, data) {
-        
-        res.writeHead(200, {'Content-Type': 'text/csv'});
-        //  console.log(res.write(data))
+                //  console.log(res.write(data))
         BreaksController.createFromCsv(req, res, data)
         res.end()
     }); 
