@@ -53,8 +53,6 @@ function getBreakSchedule(employeeObjectArray) {
 
     let unsortedBreakSchedule = []
 
-    console.log(getFloaters(employeeObjectArray))
-    console.log(employeeObjectArray)
     employeeObjectArray.map((employeeObject, index) => {
         if (index > 0) {
             employeeObject.breaks.map((breakDuration, index) => {
@@ -64,24 +62,24 @@ function getBreakSchedule(employeeObjectArray) {
                 if (index == 0) {
                     breakObject = {
                         name: employeeObject.name,
-                        startTime: ((employeeObject.startTime.getHours() * 60) + employeeObject.startTime.getMinutes()) + 60,
-                        endTime: (((employeeObject.startTime.getHours() * 60) + employeeObject.startTime.getMinutes()) + 60) + Number(breakDuration),
+                        startTime: getDateInMinutesSinceMidnight(employeeObject.startTime) + 60,
+                        endTime: getDateInMinutesSinceMidnight(employeeObject.startTime) + 60 + Number(breakDuration),
                         duration: Number(breakDuration),
                         breakNum: 1
                     } 
                 } else if (index == 1) {
                     breakObject = {
                         name: employeeObject.name,
-                        startTime: ((employeeObject.startTime.getHours() * 60) + employeeObject.startTime.getMinutes()) + 135,
-                        endTime: (((employeeObject.startTime.getHours() * 60) + employeeObject.startTime.getMinutes()) + 135) + Number(breakDuration),
+                        startTime: getDateInMinutesSinceMidnight(employeeObject.startTime) + 135,
+                        endTime: getDateInMinutesSinceMidnight(employeeObject.startTime) + 135 + Number(breakDuration),
                         duration: Number(breakDuration),
                         breakNum: 1
                     }
                 } else if (index == 2) {
                     breakObject = {
                         name: employeeObject.name,
-                        startTime: ((employeeObject.startTime.getHours() * 60) + employeeObject.startTime.getMinutes()) + 225,
-                        endTime: (((employeeObject.startTime.getHours() * 60) + employeeObject.startTime.getMinutes()) + 225) + Number(breakDuration),
+                        startTime: getDateInMinutesSinceMidnight(employeeObject.startTime) + 225,
+                        endTime: getDateInMinutesSinceMidnight(employeeObject.startTime) + 225 + Number(breakDuration),
                         duration: Number(breakDuration),
                         breakNum: 2
                     }
@@ -90,6 +88,7 @@ function getBreakSchedule(employeeObjectArray) {
             })
         }
     })
+    console.log(unsortedBreakSchedule)
     // breakSchedule = breakSchedule.sort((a, b) => a.startTime - b.startTime)
     unsortedBreakSchedule = sortSecondFifteens(sortBigBreaks(accountForOverlaps(unsortedBreakSchedule.sort((a, b) => a.startTime - b.startTime)))).sort((a, b) => a.startTime - b.startTime)
     // console.log(unsortedBreakSchedule)
