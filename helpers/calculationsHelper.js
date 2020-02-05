@@ -45,11 +45,16 @@ function getBreaks(shiftLength) {
     return breaks
 }
 
+function getDateInMinutesSinceMidnight(date) {
+    return date.getHours() * 60 + date.getMinutes()
+}
+
 function getBreakSchedule(employeeObjectArray) {
 
     let unsortedBreakSchedule = []
 
     console.log(getFloaters(employeeObjectArray))
+    console.log(employeeObjectArray)
     employeeObjectArray.map((employeeObject, index) => {
         if (index > 0) {
             employeeObject.breaks.map((breakDuration, index) => {
@@ -152,15 +157,25 @@ function sortSecondFifteens(unsortedBreakSchedule) {
 }
 
 function getFloaters(employeeObjectArray) {
+
     let floaters = []
+
+    // push each floater into floaters array
     employeeObjectArray.forEach((employeeObject, index) => {
         if (index > 0) {
             let isFloater = employeeObject.job && employeeObject.job.includes('F')
             if (isFloater) {
-                floaters.push(employeeObject)
+
+                // make a copy and convert start/end times to minutes
+                let floaterObject = {...employeeObject}
+                floaterObject.startTime = getDateInMinutesSinceMidnight(floaterObject.startTime)
+                floaterObject.endTime = getDateInMinutesSinceMidnight(floaterObject.endTime)
+
+                floaters.push(floaterObject)
             }
         }
     })
+
     return floaters
 }
 
