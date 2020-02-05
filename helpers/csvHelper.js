@@ -3,7 +3,6 @@ const { StringDecoder } = require('string_decoder')
 const decoder = new StringDecoder('utf8');
 
 function parseCsv(data) {
-
     // console.log(data)
     const output = Buffer.from(data);
     //parses the data from a data buffer to a string
@@ -11,10 +10,7 @@ function parseCsv(data) {
 
     //Papa parse converts the data to json
     let jsonconversion = Papa.parse(result).data
-    let employeeObjectArray = []
-
-    //Returns raw CSV data
-    employeeObjectArray.push(jsonconversion.map(getDateObjects))
+    let employeeObjectArray = jsonconversion.map(getDateObjects)
 
     return employeeObjectArray
 }  
@@ -42,7 +38,7 @@ function getEmployeeObject(job, name, start, end) {
         startTime: start,
         endTime: end,
     }
-    console.log(employee)
+    // console.log(employee)
     return employee
 }
 

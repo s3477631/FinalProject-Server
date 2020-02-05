@@ -12,7 +12,7 @@ const TimeSheet = new mongoose.Schema({
         type: String, 
     }, 
     duration: {
-        type: Number, 
+        type: String, 
     },
     job: {
         type: String, 
