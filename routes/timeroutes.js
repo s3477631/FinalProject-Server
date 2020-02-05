@@ -3,6 +3,7 @@ const router = express.Router()
 const multer = require('multer')
 const BreaksController = require("../controllers/breaks_controller")
 const fs = require('fs')
+const passport = require('passport')
 
 const storage = multer.diskStorage({ 
     destination: function(req, file, cb){ 
@@ -17,7 +18,7 @@ const storage = multer.diskStorage({
 const upload = multer({storage: storage})
 ('/home/ghostcoder/Downloads/preview.png')
 
-router.post('/csv', upload.single('csvFile'), function(req, res){     
+router.post('/csv',passport.authenticate("jwt", { session: false }), upload.single('csvFile'), function(req, res){     
     fs.readFile(req.file.path, async function(err, data) {
         
         res.writeHead(200, {'Content-Type': 'text/csv'});

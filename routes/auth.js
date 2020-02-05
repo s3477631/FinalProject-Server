@@ -17,7 +17,7 @@ router.post("/login", celebrate({
         password: Joi.string().required()
     }
     }), passport.authenticate('local', {
-        failureRedirect: '/login',
+    failureRedirect: '/login',
     session: false
 }), AuthController.login);
 
