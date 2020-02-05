@@ -43,8 +43,8 @@ async function createFromCsv(req, res, data) {
             employeeObject.breaks = getBreaks(employeeObject)
         }
     })
-    console.log(employeeObjectArray)
-    //getBreakSchedule(employeeObjectArray)
+    //console.log(employeeObjectArray)
+    getBreakSchedule(employeeObjectArray)
 
     employeeObjectArray.map((employeeObject) => {
         // console.log(employeeObject)

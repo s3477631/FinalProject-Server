@@ -32,21 +32,22 @@ function getBreaks(employeeObject) {
     let timeInMinutes = (minutes + hours * 60)
     let breaks = []
 
+    // break format: [duration, breakNum]
     if (timeInMinutes >= 240 && timeInMinutes <= 300) {
-        breaks.push('15')
+        breaks.push([15, 1])
     } else if (employeeObject.startTime < 11*60) {
         // they started before 11am, their fifteen should go first
         if (timeInMinutes > 300 && timeInMinutes <= 420) {
-            breaks.push('15', '30')
+            breaks.push([15, 1], [30, 1])
         } else if (timeInMinutes > 420) {
-            breaks.push('15', '30', '15')
+            breaks.push([15, 1], [30, 1], [15, 2])
         }
     } else if (employeeObject.startTime >= 11*60) {
         // they started after 11am, their thirty should go first
         if (timeInMinutes > 300 && timeInMinutes <= 420) {
-            breaks.push('30', '15')
+            breaks.push([30, 1], [15, 1])
         } else if (timeInMinutes > 420) {
-            breaks.push('30', '15', '15')
+            breaks.push([30, 1], [15, 1], [15, 2])
         }
     } else {
         console.log('something went wrong when calculating shift length')
@@ -66,40 +67,49 @@ function getBreakSchedule(employeeObjectArray) {
 
     employeeObjectArray.map((employeeObject, index) => {
         if (index > 0) {
-            employeeObject.breaks.map((breakDuration, index) => {
-                let breakObject = {}
-                // refactor to take into account break duration and 
-                // build upon last
-                if (index == 0) {
-                    breakObject = {
-                        name: employeeObject.name,
-                        startTime: getDateInMinutesSinceMidnight(employeeObject.startTime) + 60,
-                        endTime: getDateInMinutesSinceMidnight(employeeObject.startTime) + 60 + Number(breakDuration),
-                        duration: Number(breakDuration),
-                        breakNum: 1
-                    } 
-                } else if (index == 1) {
-                    breakObject = {
-                        name: employeeObject.name,
-                        startTime: getDateInMinutesSinceMidnight(employeeObject.startTime) + 135,
-                        endTime: getDateInMinutesSinceMidnight(employeeObject.startTime) + 135 + Number(breakDuration),
-                        duration: Number(breakDuration),
-                        breakNum: 1
-                    }
-                } else if (index == 2) {
-                    breakObject = {
-                        name: employeeObject.name,
-                        startTime: getDateInMinutesSinceMidnight(employeeObject.startTime) + 225,
-                        endTime: getDateInMinutesSinceMidnight(employeeObject.startTime) + 225 + Number(breakDuration),
-                        duration: Number(breakDuration),
-                        breakNum: 2
-                    }
+            let previousBreak = null
+            employeeObject.breaks.forEach(([breakDuration, breakNum]) => {
+                
+                let breakObject = {
+                    name: employeeObject.name,
+                    duration: breakDuration,
+                    breakNum: breakNum,
+                } 
+                console.log(breakDuration, employeeObject.name)
+                // determine start time
+                if (!previousBreak) {
+                    // this is the first break, can start an hour after shift commenced
+                    breakObject.startTime =  employeeObject.startTime + 60
+
+                } else {
+                    // start this break relative to the last
+                    breakObject.startTime = previousBreak.endTime + 60
                 }
+                
+                breakObject.endTime = breakObject.startTime + breakDuration
+
+                previousBreak = breakObject
                 breakSchedule.push(breakObject)
+
             })
         }
     })
     
+    breakSchedule.forEach(breakData => {
+        // if it's a first 30, subtract 10 hrs so it gets prioritised
+        if (breakData.duration == 30) {
+            employeeObjectArray.forEach((employee, index) => {
+                console.log(breakData, employee)
+                // console.log(employee)
+                if (index > 0 && employee && employee.breaks[0] && employee.breaks[0][0] == 30 && breakData.name == employee.name) {
+                    console.log("yippee")
+                    breakData.startTime -= 600
+                    breakData.endTime -=600
+                }
+            })
+        }
+    })
+
     // step 1: sort in ascending order of start time
     breakSchedule = sortInAscendingOrder(breakSchedule)
 
@@ -240,8 +250,8 @@ function getFloaters(employeeObjectArray) {
 
                 // make a copy and convert start/end times to minutes
                 let floaterObject = {...employeeObject}
-                floaterObject.startTime = getDateInMinutesSinceMidnight(floaterObject.startTime)
-                floaterObject.endTime = getDateInMinutesSinceMidnight(floaterObject.endTime)
+                //floaterObject.startTime = getDateInMinutesSinceMidnight(floaterObject.startTime)
+                //floaterObject.endTime = getDateInMinutesSinceMidnight(floaterObject.endTime)
                 floaterObject.nextAvailableTime = floaterObject.startTime
                 floaterObject.floaterNum = floaters.length + 1
                 floaters.push(floaterObject)
