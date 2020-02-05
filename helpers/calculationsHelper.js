@@ -52,9 +52,8 @@ function getDateInMinutesSinceMidnight(date) {
 function getBreakSchedule(employeeObjectArray) {
 
     let breakSchedule = []
+    let floaters = getFloaters(employeeObjectArray)
 
-    console.log(getFloaters(employeeObjectArray))
-    
     employeeObjectArray.map((employeeObject, index) => {
         if (index > 0) {
             employeeObject.breaks.map((breakDuration, index) => {
@@ -112,7 +111,7 @@ function getBreakSchedule(employeeObjectArray) {
     // and once at the end
 
     // step 2: account for overlaps given floater availability
-    breakSchedule = accountForOverlaps(breakSchedule)
+    breakSchedule = sortFirstFifteens(breakSchedule, floaters)
 
     // step 3: move 30 min breaks to start at 12 pm
     breakSchedule = sortBigBreaks(breakSchedule)
@@ -123,7 +122,7 @@ function getBreakSchedule(employeeObjectArray) {
     // step 5: finally, sort again in ascending order
     breakSchedule = sortInAscendingOrder(breakSchedule)
     
-    //console.log(displayAsDecimal(breakSchedule))
+    console.log(displayAsDecimal(breakSchedule))
 }
 
 function displayAsDecimal(breakSchedule) {
@@ -168,37 +167,36 @@ function accountForOverlaps(unsortedBreakSchedule, numFloaters) {
 
 // new account for overlaps function
 function sortFirstFifteens(breakSchedule, floaters) {
-    // iterate through break schedule
-    // if this break has an available floater, assign this break to a floater
-    // otherwise
-    let buffer = 0
-    let sameCount = 0
-    breakSchedule = breakSchedule.map((thisBreak, index) => {
-        const previousBreak = breakSchedule[index-1]
-        // only increase start time if same count >= num floaters *at this point in time*
-        // this indicates we're over capacity
-        // i.e. 3 breaks need to be done at the same time
-        // but we only have 2 floaters
-        if (previousBreak && previousBreak.startTime == thisBreak.startTime) {
-            // console.log(`Last break matches this one`)
-            thisBreak.startTime = thisBreak.startTime + buffer + previousBreak.duration
-            thisBreak.endTime = thisBreak.endTime + buffer + previousBreak.duration
-            buffer += previousBreak.duration
+    
+    return breakSchedule.map((thisBreak) => {
+
+        // skip 30's, they're out of order
+        if (thisBreak.duration === 30) {
+            return thisBreak
         }
-        // console.log(thisBreak)
+
+        // sort floaters by ascending nextAvailableTime
+        floaters.sort((a, b) => a.nextAvailableTime - b.nextAvailableTime)
+
+        // find the next available floater
+        let nextAvailableFloater = floaters[0]
+        let nextAvailableTime = nextAvailableFloater.nextAvailableTime
+
+        // adjust the start/end time of this break relative to nextAvailableTime
+        thisBreak.floaterNum = nextAvailableFloater.floaterNum
+        thisBreak.startTime = nextAvailableTime
+        thisBreak.endTime = nextAvailableTime + thisBreak.duration
+
+        // since we have assigned this floater this break,
+        // their next available time will be when this break ends
+        nextAvailableFloater.nextAvailableTime = thisBreak.endTime
+
         return thisBreak
+        
     })
-    return breakSchedule
+
 }
 
-function floaterIsAvailabile(time, floaters) {
-    // given a time, find whether there is a floater free to do this break
-    // need to know what breaks the floater is currently on
-    // iterate through floaters, return true if floater is free
-    // free meaning the passed time is between the floater's start and end time
-    // and they have finished their previous break
-    // store when they'll be next free
-}
 
 let last30EndTime = 0 // this line should reset or it may break on multiple uploads
 
@@ -248,7 +246,7 @@ function getFloaters(employeeObjectArray) {
                 floaterObject.startTime = getDateInMinutesSinceMidnight(floaterObject.startTime)
                 floaterObject.endTime = getDateInMinutesSinceMidnight(floaterObject.endTime)
                 floaterObject.nextAvailableTime = floaterObject.startTime
-
+                floaterObject.floaterNum = floaters.length + 1
                 floaters.push(floaterObject)
             }
         }
