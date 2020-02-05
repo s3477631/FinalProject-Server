@@ -34,3 +34,17 @@ describe('test upload csv function', function() {
             });
         });
 });
+
+describe('test login function', function() {
+    it('should give back 200 response code', function(done) {
+        chai.request(server)
+            .post('/auth/login')
+            .send({'email': 'ferdy@admin.com', 'password': 'ferdyspassword'})
+            .end(function(err, res){
+                console.log(res)
+                res.body.should.be.a('string')
+                res.should.have.status(200)
+                done()
+            });
+        });
+});
