@@ -51,7 +51,7 @@ function getDateInMinutesSinceMidnight(date) {
 
 function getBreakSchedule(employeeObjectArray) {
 
-    let unsortedBreakSchedule = []
+    let breakSchedule = []
 
     employeeObjectArray.map((employeeObject, index) => {
         if (index > 0) {
@@ -84,17 +84,32 @@ function getBreakSchedule(employeeObjectArray) {
                         breakNum: 2
                     }
                 }
-                unsortedBreakSchedule.push(breakObject)
+                breakSchedule.push(breakObject)
             })
         }
     })
-    console.log(unsortedBreakSchedule)
-    // breakSchedule = breakSchedule.sort((a, b) => a.startTime - b.startTime)
-    unsortedBreakSchedule = sortSecondFifteens(sortBigBreaks(accountForOverlaps(unsortedBreakSchedule.sort((a, b) => a.startTime - b.startTime)))).sort((a, b) => a.startTime - b.startTime)
-    // console.log(unsortedBreakSchedule)
+    
+    // step 1: sort in ascending order of start time
+    breakSchedule = sortInAscendingOrder(breakSchedule)
+
+    // step 2: account for overlaps given floater availability
+    breakSchedule = accountForOverlaps(breakSchedule)
+
+    // step 3: move 30 min breaks to start at 12 pm
+    breakSchedule = sortBigBreaks(breakSchedule)
+
+    // step 4: move 15 min breaks to start after the final 30 min break
+    breakSchedule = sortSecondFifteens(breakSchedule)
+
+    // step 5: finally, sort again in ascending order
+    breakSchedule = sortInAscendingOrder(breakSchedule)
+    
+    console.log(breakSchedule)
 }
 
-let last30EndTime = 0
+function sortInAscendingOrder(breakSchedule) {
+    return breakSchedule.sort((a, b) => a.startTime - b.startTime)
+}
 
 // account for overlaps
 // iterate through Array
@@ -123,6 +138,8 @@ function accountForOverlaps(unsortedBreakSchedule, numFloaters) {
     })
     return unsortedBreakSchedule
 }
+
+let last30EndTime = 0 // this line should reset or it may break on multiple uploads
 
 function sortBigBreaks(unsortedBreakSchedule) {
     let count = 0
@@ -178,11 +195,7 @@ function getFloaters(employeeObjectArray) {
     return floaters
 }
 
-// take into account floater start times
 
-function divideAmongFloaters(breakSchedule, numFloaters) {
-
-}
 
 module.exports = {
     getShiftLength,
