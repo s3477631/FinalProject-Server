@@ -1,6 +1,7 @@
 const TimeSheet = require('../database/models/timesheet_model')
+const ScheduleSheet = require('../database/models/schedule_model')
 const parseCsv = require('../helpers/csvHelper')
-const { getShiftLength, getBreaks, getBreakSchedule, getFloaterCount, getFifteens, getThirties } = require('../helpers/calculationsHelper')
+const { getShiftLength, getFloaterNumber, getTotalBreakTime, getBreaks, getBreakSchedule,  getFifteens, getThirties, convertStartEndTimesToMinutes, } = require('../helpers/calculationsHelper')
 
 async function index(req, res){ 
     RawModel.find()
@@ -35,35 +36,42 @@ async function createFromCsv(req, res, data) {
         }
     })
 
+    convertStartEndTimesToMinutes(employeeObjectArray)
+
     employeeObjectArray.map((employeeObject, index) => {
         if (index > 0) {
-            employeeObject.breaks = getBreaks(employeeObject.duration)
+            employeeObject.breaks = getBreaks(employeeObject)
         }
     })
 
-    
 
-
-    date = Date.now()
-    dateObject = Date.parse(date)
+    	
+    let today = new Date();
+    let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
     let fifteens = getFifteens(employeeObjectArray)
-    console.log(fifteens)
-    // let thirties = getThirties(employeeObjectArray)
-    let floaters = getFloaterCount(employeeObjectArray)
+    let thirties = getThirties(employeeObjectArray)
+    let totalBreakTime = getTotalBreakTime(employeeObjectArray)
+    let floaters = getFloaterNumber(employeeObjectArray)
     let breaks = getBreakSchedule(employeeObjectArray)
 
     finalObject = {
-        date: dateObject,
+        date: date,
         totalFifteen: fifteens,
         totalThirties: thirties,
-        totalBreakTime: "",
-        goalTime: "",
+        totalBreakTime: totalBreakTime,
+        goalTime: 960,
         numFloaters: floaters,
         breaks: breaks,
     }
+
+    ScheduleSheet.create(finalObject)
+
+
     employeeObjectArray.map((employeeObject) => {
         TimeSheet.create(employeeObject)
     })
+
+    res.send(finalObject)
 }
 
 module.exports = { 

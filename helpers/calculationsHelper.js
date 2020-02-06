@@ -21,7 +21,9 @@ function getShiftLength(object) {
     return shiftLength
 }
 
-function getBreaks(shiftLength) {
+function getBreaks(employeeObject) {
+
+    let shiftLength = employeeObject.duration
     let shiftLengthArray = shiftLength.split(' ')
 
     let hours = Number(shiftLengthArray[0])
@@ -30,14 +32,23 @@ function getBreaks(shiftLength) {
     let timeInMinutes = (minutes + hours * 60)
     let breaks = []
 
+    // break format: [duration, breakNum]
     if (timeInMinutes >= 240 && timeInMinutes <= 300) {
-        breaks.push('15')
-    } else if (timeInMinutes > 300 && timeInMinutes <= 420) {
-        breaks.push('15', '30')
-    } else if (timeInMinutes > 420 && timeInMinutes <= 540) {
-        breaks.push('15', '30', '15')
-    } else if (timeInMinutes > 540) {
-        // breaks.push('15', '30', '15', '30')
+        breaks.push([15, 1])
+    } else if (employeeObject.startTime < 11*60) {
+        // they started before 11am, their fifteen should go first
+        if (timeInMinutes > 300 && timeInMinutes <= 420) {
+            breaks.push([15, 1], [30, 1])
+        } else if (timeInMinutes > 420) {
+            breaks.push([15, 1], [30, 1], [15, 2])
+        }
+    } else if (employeeObject.startTime >= 11*60) {
+        // they started after 11am, their thirty should go first
+        if (timeInMinutes > 300 && timeInMinutes <= 420) {
+            breaks.push([30, 1], [15, 1])
+        } else if (timeInMinutes > 420) {
+            breaks.push([30, 1], [15, 1], [15, 2])
+        }
     } else {
         console.log('something went wrong when calculating shift length')
     }
@@ -45,109 +56,232 @@ function getBreaks(shiftLength) {
     return breaks
 }
 
+function getDateInMinutesSinceMidnight(date) {
+    return date.getHours() * 60 + date.getMinutes()
+}
+
 function getBreakSchedule(employeeObjectArray) {
-    let unsortedBreakSchedule = []
+
+    let breakSchedule = []
+    let floaters = getFloaters(employeeObjectArray)
+
     employeeObjectArray.map((employeeObject, index) => {
         if (index > 0) {
-            employeeObject.breaks.map((breakDuration, index) => {
-                let breakObject = {}
-                if (index == 0) {
-                    breakObject = {
-                        name: employeeObject.name,
-                        startTime: ((employeeObject.startTime.getHours() * 60) + employeeObject.startTime.getMinutes()) + 60,
-                        endTime: (((employeeObject.startTime.getHours() * 60) + employeeObject.startTime.getMinutes()) + 60) + Number(breakDuration),
-                        duration: Number(breakDuration),
-                        breakNum: 1
-                    } 
-                } else if (index == 1) {
-                    breakObject = {
-                        name: employeeObject.name,
-                        startTime: ((employeeObject.startTime.getHours() * 60) + employeeObject.startTime.getMinutes()) + 135,
-                        endTime: (((employeeObject.startTime.getHours() * 60) + employeeObject.startTime.getMinutes()) + 135) + Number(breakDuration),
-                        duration: Number(breakDuration),
-                        breakNum: 1
-                    }
-                } else if (index == 2) {
-                    breakObject = {
-                        name: employeeObject.name,
-                        startTime: ((employeeObject.startTime.getHours() * 60) + employeeObject.startTime.getMinutes()) + 225,
-                        endTime: (((employeeObject.startTime.getHours() * 60) + employeeObject.startTime.getMinutes()) + 225) + Number(breakDuration),
-                        duration: Number(breakDuration),
-                        breakNum: 2
-                    }
+            let previousBreak = null
+            employeeObject.breaks.forEach(([breakDuration, breakNum]) => {
+                
+                let breakObject = {
+                    name: employeeObject.name,
+                    duration: breakDuration,
+                    breakNum: breakNum,
+                } 
+                // determine start time
+                if (!previousBreak) {
+                    // this is the first break, can start an hour after shift commenced
+                    breakObject.startTime =  employeeObject.startTime + 60
+
+                } else {
+                    // start this break relative to the last
+                    breakObject.startTime = previousBreak.endTime + 60
                 }
-                unsortedBreakSchedule.push(breakObject)
+                
+                breakObject.endTime = breakObject.startTime + breakDuration
+
+                previousBreak = breakObject
+                breakSchedule.push(breakObject)
+
             })
         }
     })
-    // breakSchedule = breakSchedule.sort((a, b) => a.startTime - b.startTime)
-    unsortedBreakSchedule = sortSecondFifteens(sortBigBreaks(accountForOverlaps(unsortedBreakSchedule.sort((a, b) => a.startTime - b.startTime)))).sort((a, b) => a.startTime - b.startTime)
+    
+    breakSchedule.forEach(breakData => {
+        // if it's a first 30, subtract 10 hrs so it gets prioritised
+        if (breakData.duration == 30) {
+            employeeObjectArray.forEach((employee, index) => {
+                if (index > 0 && employee && employee.breaks[0] && employee.breaks[0][0] == 30 && breakData.name == employee.name) {
+                    breakData.startTime -= 600
+                    breakData.endTime -=600
+                }
+            })
+        }
+    })
+
+    // step 1: sort in ascending order of start time
+    breakSchedule = sortInAscendingOrder(breakSchedule)
+
+    // step 2: account for overlaps given floater availability
+    breakSchedule = sortFirstFifteens(breakSchedule, floaters)
+
+    // step 3: move 30 min breaks to start at 12 pm
+    breakSchedule = sortThirties(breakSchedule, floaters)
+
+    // step 4: move 15 min breaks to start after the final 30 min break
+    breakSchedule = sortSecondFifteens(breakSchedule, floaters)
+
+    // step 5: finally, sort again in ascending order
+    breakSchedule = sortInAscendingOrder(breakSchedule)
+    
+    return breakSchedule
 }
 
-let last30EndTime = 0
+function displayAsDecimal(breakSchedule) {
+    return breakSchedule.map(breakData => {
+        breakData.startTime /= 60
+        breakData.endTime /= 60
+        return breakData
+    })
+}
+ 
+function sortInAscendingOrder(breakSchedule) {
+    return breakSchedule.sort((a, b) => a.startTime - b.startTime)
+}
 
-// account for overlaps
-// iterate through Array
-// if start time of previous element matches this element,
-// increase the start time if this element by the buffer + the duration of the previous element
+// new account for overlaps function
+function sortFirstFifteens(breakSchedule, floaters) {
+    
+    return breakSchedule.map((thisBreak) => {
 
-function accountForOverlaps(unsortedBreakSchedule) {
-    let buffer = 0
-    unsortedBreakSchedule = unsortedBreakSchedule.map((thisBreak, index) => {
-        const previousBreak = unsortedBreakSchedule[index-1]
-        if (previousBreak && previousBreak.startTime == thisBreak.startTime) {
-            console.log(`Last break matches this one`)
-            thisBreak.startTime = thisBreak.startTime + buffer + previousBreak.duration
-            thisBreak.endTime = thisBreak.endTime + buffer + previousBreak.duration
-            buffer += previousBreak.duration
+        // skip 30's, they're out of order
+        if (thisBreak.duration === 30) {
+            return thisBreak
         }
+
+        // sort floaters by ascending nextAvailableTime
+        floaters.sort((a, b) => a.nextAvailableTime - b.nextAvailableTime)
+
+        // find the next available floater
+        let nextAvailableFloater = floaters[0]
+        let nextAvailableTime = nextAvailableFloater.nextAvailableTime
+
+        // adjust the start/end time of this break relative to nextAvailableTime
+        thisBreak.floaterNum = nextAvailableFloater.floaterNum
+        thisBreak.startTime = Math.max(thisBreak.startTime, nextAvailableTime)
+        thisBreak.endTime = thisBreak.startTime + thisBreak.duration
+
+        // since we have assigned this floater this break,
+        // their next available time will be when this break ends
+        nextAvailableFloater.nextAvailableTime = thisBreak.endTime
+
         return thisBreak
+
     })
-    return unsortedBreakSchedule
+
 }
 
-function sortBigBreaks(unsortedBreakSchedule) {
-    let count = 0
-    unsortedBreakSchedule = unsortedBreakSchedule.map((breakData) => {
-        if (breakData.duration === 30) {
-            breakData.startTime = 720 + (30 * count)
-            count = count + 1
-            breakData.endTime = breakData.startTime + 30
-            last30EndTime = breakData.endTime
+function sortThirties(breakSchedule, floaters) {
+    
+    floaters.forEach(floater => {
+        floater.nextAvailableTime = 720
+    })
+
+    return breakSchedule.map((thisBreak) => {
+
+        // now ignore 15's
+        if (thisBreak.duration === 15) {
+            return thisBreak
         }
-        return breakData
+
+        // sort floaters by ascending nextAvailableTime
+        floaters.sort((a, b) => a.nextAvailableTime - b.nextAvailableTime)
+
+        // find the next available floater
+        let nextAvailableFloater = floaters[0]
+        let nextAvailableTime = nextAvailableFloater.nextAvailableTime
+
+        // adjust the start/end time of this break relative to nextAvailableTime
+        thisBreak.floaterNum = nextAvailableFloater.floaterNum
+        thisBreak.startTime = nextAvailableTime
+        thisBreak.endTime = nextAvailableTime + thisBreak.duration
+
+        // since we have assigned this floater this break,
+        // their next available time will be when this break ends
+        nextAvailableFloater.nextAvailableTime = thisBreak.endTime
+
+        return thisBreak
+        
     })
-    // unsortedBreakSchedule = unsortedBreakSchedule.sort((a, b) => a.startTime - b.startTime)
-    // console.log(unsortedBreakSchedule)
-    return unsortedBreakSchedule
+
 }
 
-function sortSecondFifteens(unsortedBreakSchedule) {
-    let count = 0
-    unsortedBreakSchedule = unsortedBreakSchedule.map((breakData) => {
-        // if break is after 12 and is 15 mins long
-        if (breakData.startTime >= 720 && breakData.duration === 15) {
-            breakData.startTime = last30EndTime + (15 * count)
-            count = count + 1
-            breakData.endTime = breakData.startTime + 15
+// new account for overlaps function
+function sortSecondFifteens(breakSchedule, floaters) {
+    
+    return breakSchedule.map((thisBreak) => {
+
+        if (thisBreak.startTime >= 720 && thisBreak.duration === 15) {
+
+            // sort floaters by ascending nextAvailableTime
+            floaters.sort((a, b) => a.nextAvailableTime - b.nextAvailableTime)
+
+            // find the next available floater
+            let nextAvailableFloater = floaters[0]
+            let nextAvailableTime = nextAvailableFloater.nextAvailableTime
+
+            // adjust the start/end time of this break relative to nextAvailableTime
+            thisBreak.floaterNum = nextAvailableFloater.floaterNum
+            thisBreak.startTime = Math.max(thisBreak.startTime, nextAvailableTime)
+            thisBreak.endTime = thisBreak.startTime + thisBreak.duration
+
+            // since we have assigned this floater this break,
+            // their next available time will be when this break ends
+            nextAvailableFloater.nextAvailableTime = thisBreak.endTime
+
         }
-        return breakData
+
+        return thisBreak
+
     })
-    // console.log(unsortedBreakSchedule)
-    return unsortedBreakSchedule
+
 }
 
-function getFloaterCount(employeeObjectArray) {
-    let floaterCount = 0
-    employeeObjectArray.map((employeeObject, index) => {
+function getFloaters(employeeObjectArray) {
+
+    let floaters = []
+
+    // push each floater into floaters array
+    employeeObjectArray.forEach((employeeObject, index) => {
         if (index > 0) {
-            if (!employeeObject.job.search('F')) {
-                floaterCount = floaterCount + 1
+            let isFloater = employeeObject.job && employeeObject.job.includes('F')
+            if (isFloater) {
+
+                // make a copy and convert start/end times to minutes
+                let floaterObject = {...employeeObject}
+                //floaterObject.startTime = getDateInMinutesSinceMidnight(floaterObject.startTime)
+                //floaterObject.endTime = getDateInMinutesSinceMidnight(floaterObject.endTime)
+                floaterObject.nextAvailableTime = floaterObject.startTime
+                floaterObject.floaterNum = floaters.length + 1
+                floaters.push(floaterObject)
             }
         }
     })
-    
-    return floaterCount
+
+    return floaters
+}
+
+function getFloaterNumber(employeeObjectArray) {
+
+    let floaters = 0
+
+    // push each floater into floaters array
+    employeeObjectArray.map((employeeObject, index) => {
+        if (index > 0) {
+            if (employeeObject.job.includes('f') || employeeObject.job.includes('F')) {
+                floaters = floaters + 1
+            }
+        }
+    })
+    console.log(floaters)
+    return floaters
+}
+
+function convertStartEndTimesToMinutes(employeeObjectArray) {
+    return employeeObjectArray.map((employeeObject, index) => {
+        if (index > 0) {
+            employeeObject.startTime = getDateInMinutesSinceMidnight(employeeObject.startTime)
+            employeeObject.endTime = getDateInMinutesSinceMidnight(employeeObject.endTime)
+            return employeeObject
+        }
+    })
 }
 
 function getFifteens(employeeObjectArray) {
@@ -155,8 +289,8 @@ function getFifteens(employeeObjectArray) {
     employeeObjectArray.map((employeeObject, index) => {
         if (index > 0) {
             employeeObject.breaks.map((employeeBreak) => {
-                if (employeeBreak == '15') {
-                    totalFifteens = totalFifteens + 1
+                if (employeeBreak[0] == 15) {
+                    totalFifteens = totalFifteens + (1 * employeeBreak[1])
                 }
             })
         }
@@ -168,20 +302,38 @@ function getThirties(employeeObjectArray) {
     let totalThirties = 0
     employeeObjectArray.map((employeeObject, index) => {
         if (index > 0) {
-            if (!employeeObject.breaks.search(15)) {
-                totalThirties = totalThirties + 1
-            }
+            employeeObject.breaks.map((employeeBreak) => {
+                if (employeeBreak[0] == 30) {
+                    totalThirties = totalThirties + 1
+                }
+            })
         }
     })
-    
     return totalThirties
 }
+
+function getTotalBreakTime(employeeObjectArray) {
+    let totalBreakTime = 0
+    employeeObjectArray.map((employeeObject, index) => {
+        if (index > 0) {
+            employeeObject.breaks.map((employeeBreak) => {
+                totalBreakTime = totalBreakTime + employeeBreak[0]
+            })
+        }
+    })
+    return totalBreakTime
+}
+
+
 
 module.exports = {
     getShiftLength,
     getBreaks,
     getBreakSchedule, 
-    getFloaterCount,
+    getFloaters,
     getFifteens,
-    getThirties
+    getThirties,
+    convertStartEndTimesToMinutes,
+    getTotalBreakTime,
+    getFloaterNumber,
 }

@@ -1,10 +1,9 @@
 const mongoose = require ("mongoose")
-const Breaks = require('./times_schema')
 
 
-const Schedule = new mongoose.schema({
+const Schedule = new mongoose.Schema({
     date: {
-        type: Object,
+        type: String,
     },
     totalFifteen: {
         type: Number
@@ -21,8 +20,9 @@ const Schedule = new mongoose.schema({
     numFloaters: {
         type: Number
     },
-    breaks: [Breaks],
-
+    breaks: {
+        type: Object
+    },
 })
 
 module.exports = Schedule

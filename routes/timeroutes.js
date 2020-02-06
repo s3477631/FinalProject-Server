@@ -21,7 +21,6 @@ const upload = multer({storage: storage}, ('/home/ghostcoder/Downloads/preview.p
 router.post('/csv',passport.authenticate("jwt", { session: false }), upload.single('csvFile'), function(req, res){     
     fs.readFile(req.file.path, async function(err, data) {
         BreaksController.createFromCsv(req, res, data)
-        res.end()
     }); 
 })
 
