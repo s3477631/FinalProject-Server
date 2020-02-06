@@ -1,9 +1,9 @@
- const TimeSheet = require('../database/models/timesheet_model')
- const parseCsv = require('../helpers/csvHelper')
- const { getShiftLength } = require('../helpers/calculationsHelper')
+const TimeSheet = require('../database/models/timesheet_model')
+const ScheduleSheet = require('../database/models/schedule_model')
+const parseCsv = require('../helpers/csvHelper')
+const { getShiftLength, getFloaterNumber, getTotalBreakTime, getBreaks, getBreakSchedule,  getFifteens, getThirties, convertStartEndTimesToMinutes, } = require('../helpers/calculationsHelper')
 
 async function index(req, res){ 
-    console.log(res)
     RawModel.find()
     .then(rawdatas => res.send(rawdatas))
 }
@@ -29,17 +29,50 @@ async function show(req, res){
 
 async function createFromCsv(req, res, data) {
     let employeeObjectArray = await parseCsv(data)
+    employeeObjectArray.map((employeeObject, index) => {
+        if (index > 0) {
+            employeeObject.duration = getShiftLength(employeeObject)
+        }
+    })
+
+    convertStartEndTimesToMinutes(employeeObjectArray)
+
+    employeeObjectArray.map((employeeObject, index) => {
+        if (index > 0) {
+            employeeObject.breaks = getBreaks(employeeObject)
+        }
+    })
+
+
+    	
+    let today = new Date();
+    let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    let fifteens = getFifteens(employeeObjectArray)
+    let thirties = getThirties(employeeObjectArray)
+    let totalBreakTime = getTotalBreakTime(employeeObjectArray)
+    let floaters = getFloaterNumber(employeeObjectArray)
+    let breaks = getBreakSchedule(employeeObjectArray)
+
+    finalObject = {
+        date: date,
+        totalFifteen: fifteens,
+        totalThirties: thirties,
+        totalBreakTime: totalBreakTime,
+        goalTime: 960,
+        numFloaters: floaters,
+        breaks: breaks,
+    }
+
+    ScheduleSheet.create(finalObject)
+
+
     employeeObjectArray.map((employeeObject) => {
         TimeSheet.create(employeeObject)
     })
-
-    employeeObjectArray.map((object, index) => {
-        if (index > 0) {
-            object.duration = getShiftLength(object)
-            console.log(object)
-        }
-    })
+    res.send(finalObject)
 }
+
+
 
 module.exports = { 
     create, 

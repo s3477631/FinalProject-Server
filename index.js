@@ -15,3 +15,5 @@ global.HTTPError = class HTTPError extends Error {
 };
 
 app.listen(process.env.PORT, () => console.log(`Listening on port ${process.env.PORT}`));
+
+module.exports = app
