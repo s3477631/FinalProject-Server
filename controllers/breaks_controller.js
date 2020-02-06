@@ -3,7 +3,6 @@ const parseCsv = require('../helpers/csvHelper')
 const { getShiftLength, getBreaks, getBreakSchedule, getFloaterCount } = require('../helpers/calculationsHelper')
 
 async function index(req, res){ 
-    console.log(res)
     RawModel.find()
     .then(rawdatas => res.send(rawdatas))
 }
@@ -44,7 +43,6 @@ async function createFromCsv(req, res, data) {
 
     getBreakSchedule(employeeObjectArray)
     employeeObjectArray.map((employeeObject) => {
-        // console.log(employeeObject)
         TimeSheet.create(employeeObject)
     })
 }
