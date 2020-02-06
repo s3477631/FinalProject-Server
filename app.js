@@ -8,7 +8,7 @@ const passport = require("./config/passport");
 
 app.use(
   cors({
-    origin: "https://goofy-cori-5c2197.netlify.com/",
+    origin: "http://localhost:3000",
     })
 );
 
