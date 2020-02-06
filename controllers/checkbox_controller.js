@@ -19,8 +19,9 @@ async function endtimes(req, res) {
     let time = Date.now()           
     let endtime = new Date(time)
     let output = req.body
+    let search = JSON.parse(output)
 //Find start time object 
- AnalysisSheet.find(output).then(response => res.send(response))
+ AnalysisSheet.find(search).then(response => res.send(response))   
  
 
 }
