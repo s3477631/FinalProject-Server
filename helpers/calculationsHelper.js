@@ -75,7 +75,6 @@ function getBreakSchedule(employeeObjectArray) {
                     duration: breakDuration,
                     breakNum: breakNum,
                 } 
-                console.log(breakDuration, employeeObject.name)
                 // determine start time
                 if (!previousBreak) {
                     // this is the first break, can start an hour after shift commenced
@@ -99,10 +98,7 @@ function getBreakSchedule(employeeObjectArray) {
         // if it's a first 30, subtract 10 hrs so it gets prioritised
         if (breakData.duration == 30) {
             employeeObjectArray.forEach((employee, index) => {
-                console.log(breakData, employee)
-                // console.log(employee)
                 if (index > 0 && employee && employee.breaks[0] && employee.breaks[0][0] == 30 && breakData.name == employee.name) {
-                    console.log("yippee")
                     breakData.startTime -= 600
                     breakData.endTime -=600
                 }
@@ -125,7 +121,7 @@ function getBreakSchedule(employeeObjectArray) {
     // step 5: finally, sort again in ascending order
     breakSchedule = sortInAscendingOrder(breakSchedule)
     
-    console.log(displayAsDecimal(breakSchedule))
+    return breakSchedule
 }
 
 function displayAsDecimal(breakSchedule) {
@@ -262,6 +258,22 @@ function getFloaters(employeeObjectArray) {
     return floaters
 }
 
+function getFloaterNumber(employeeObjectArray) {
+
+    let floaters = 0
+
+    // push each floater into floaters array
+    employeeObjectArray.map((employeeObject, index) => {
+        if (index > 0) {
+            if (employeeObject.job.includes('f') || employeeObject.job.includes('F')) {
+                floaters = floaters + 1
+            }
+        }
+    })
+    console.log(floaters)
+    return floaters
+}
+
 function convertStartEndTimesToMinutes(employeeObjectArray) {
     return employeeObjectArray.map((employeeObject, index) => {
         if (index > 0) {
@@ -272,10 +284,56 @@ function convertStartEndTimesToMinutes(employeeObjectArray) {
     })
 }
 
+function getFifteens(employeeObjectArray) {
+    let totalFifteens = 0
+    employeeObjectArray.map((employeeObject, index) => {
+        if (index > 0) {
+            employeeObject.breaks.map((employeeBreak) => {
+                if (employeeBreak[0] == 15) {
+                    totalFifteens = totalFifteens + (1 * employeeBreak[1])
+                }
+            })
+        }
+    })
+    return totalFifteens
+}
+
+function getThirties(employeeObjectArray) {
+    let totalThirties = 0
+    employeeObjectArray.map((employeeObject, index) => {
+        if (index > 0) {
+            employeeObject.breaks.map((employeeBreak) => {
+                if (employeeBreak[0] == 30) {
+                    totalThirties = totalThirties + 1
+                }
+            })
+        }
+    })
+    return totalThirties
+}
+
+function getTotalBreakTime(employeeObjectArray) {
+    let totalBreakTime = 0
+    employeeObjectArray.map((employeeObject, index) => {
+        if (index > 0) {
+            employeeObject.breaks.map((employeeBreak) => {
+                totalBreakTime = totalBreakTime + employeeBreak[0]
+            })
+        }
+    })
+    return totalBreakTime
+}
+
+
+
 module.exports = {
     getShiftLength,
     getBreaks,
     getBreakSchedule, 
     getFloaters,
-    convertStartEndTimesToMinutes
+    getFifteens,
+    getThirties,
+    convertStartEndTimesToMinutes,
+    getTotalBreakTime,
+    getFloaterNumber,
 }

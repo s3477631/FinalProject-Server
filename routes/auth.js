@@ -21,6 +21,4 @@ router.post("/login", celebrate({
     session: false
 }), AuthController.login);
 
-
-
 module.exports = router

@@ -25,7 +25,6 @@ async function endtimes(req, res) {
 
 }
 
-
 module.exports = { 
     starttimes, 
     endtimes

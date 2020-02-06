@@ -20,8 +20,6 @@ async function login(req, res, next){
     res.json(token);
 }
 
-
-
 module.exports = {
     register,
     login

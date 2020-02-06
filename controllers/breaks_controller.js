@@ -1,9 +1,9 @@
- const TimeSheet = require('../database/models/timesheet_model')
- const parseCsv = require('../helpers/csvHelper')
- const { getShiftLength, getBreaks, getBreakSchedule, convertStartEndTimesToMinutes } = require('../helpers/calculationsHelper')
+const TimeSheet = require('../database/models/timesheet_model')
+const ScheduleSheet = require('../database/models/schedule_model')
+const parseCsv = require('../helpers/csvHelper')
+const { getShiftLength, getFloaterNumber, getTotalBreakTime, getBreaks, getBreakSchedule,  getFifteens, getThirties, convertStartEndTimesToMinutes, } = require('../helpers/calculationsHelper')
 
 async function index(req, res){ 
-    console.log(res)
     RawModel.find()
     .then(rawdatas => res.send(rawdatas))
 }
@@ -42,14 +42,35 @@ async function createFromCsv(req, res, data) {
             employeeObject.breaks = getBreaks(employeeObject)
         }
     })
-    //console.log(employeeObjectArray)
-    console.log(getBreakSchedule(employeeObjectArray))
+
+
+    	
+    let today = new Date();
+    let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    let fifteens = getFifteens(employeeObjectArray)
+    let thirties = getThirties(employeeObjectArray)
+    let totalBreakTime = getTotalBreakTime(employeeObjectArray)
+    let floaters = getFloaterNumber(employeeObjectArray)
+    let breaks = getBreakSchedule(employeeObjectArray)
+
+    finalObject = {
+        date: date,
+        totalFifteen: fifteens,
+        totalThirties: thirties,
+        totalBreakTime: totalBreakTime,
+        goalTime: 960,
+        numFloaters: floaters,
+        breaks: breaks,
+    }
+
+    ScheduleSheet.create(finalObject)
+
 
     employeeObjectArray.map((employeeObject) => {
-        // console.log(employeeObject)
         TimeSheet.create(employeeObject)
     })
- 
+
+    res.send(finalObject)
 }
 
 
