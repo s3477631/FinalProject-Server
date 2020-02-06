@@ -3,10 +3,12 @@ const UserModel = require("../database/models/users_model")
 const LocalStrategy = require("passport-local");
 const { Strategy: JwtStrategy, ExtractJwt } = require("passport-jwt");
 
+//serializes the user 
 passport.serializeUser((user, done) => {
     done(null, user._id);
 });
 
+//deserializes the user and then searches for a student
 passport.deserializeUser(async (id, done) => {
     try {
         const user = await UserModel.findById(id);

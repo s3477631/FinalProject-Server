@@ -18,8 +18,8 @@ app.use(morgan("combined"));
 
 app.use(
     cors({
-      origin: "https://goofy-cori-5c2197.netlify.com/"
-    })
+      origin: "https://goofy-cori-5c2197.netlify.com/",
+      })
   );
 app.use(require("./routes"));
 
