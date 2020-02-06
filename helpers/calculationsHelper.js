@@ -82,7 +82,6 @@ function getBreakSchedule(employeeObjectArray) {
     })
     // breakSchedule = breakSchedule.sort((a, b) => a.startTime - b.startTime)
     unsortedBreakSchedule = sortSecondFifteens(sortBigBreaks(accountForOverlaps(unsortedBreakSchedule.sort((a, b) => a.startTime - b.startTime)))).sort((a, b) => a.startTime - b.startTime)
-    console.log(unsortedBreakSchedule)
 }
 
 let last30EndTime = 0
@@ -102,7 +101,6 @@ function accountForOverlaps(unsortedBreakSchedule) {
             thisBreak.endTime = thisBreak.endTime + buffer + previousBreak.duration
             buffer += previousBreak.duration
         }
-        console.log(thisBreak)
         return thisBreak
     })
     return unsortedBreakSchedule
@@ -152,9 +150,38 @@ function getFloaterCount(employeeObjectArray) {
     return floaterCount
 }
 
+function getFifteens(employeeObjectArray) {
+    let totalFifteens = 0
+    employeeObjectArray.map((employeeObject, index) => {
+        if (index > 0) {
+            employeeObject.breaks.map((employeeBreak) => {
+                if (employeeBreak == '15') {
+                    totalFifteens = totalFifteens + 1
+                }
+            })
+        }
+    })
+    return totalFifteens
+}
+
+function getThirties(employeeObjectArray) {
+    let totalThirties = 0
+    employeeObjectArray.map((employeeObject, index) => {
+        if (index > 0) {
+            if (!employeeObject.breaks.search(15)) {
+                totalThirties = totalThirties + 1
+            }
+        }
+    })
+    
+    return totalThirties
+}
+
 module.exports = {
     getShiftLength,
     getBreaks,
     getBreakSchedule, 
-    getFloaterCount
+    getFloaterCount,
+    getFifteens,
+    getThirties
 }

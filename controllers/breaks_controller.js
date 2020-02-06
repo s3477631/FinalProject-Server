@@ -1,6 +1,6 @@
 const TimeSheet = require('../database/models/timesheet_model')
 const parseCsv = require('../helpers/csvHelper')
-const { getShiftLength, getBreaks, getBreakSchedule, getFloaterCount } = require('../helpers/calculationsHelper')
+const { getShiftLength, getBreaks, getBreakSchedule, getFloaterCount, getFifteens, getThirties } = require('../helpers/calculationsHelper')
 
 async function index(req, res){ 
     RawModel.find()
@@ -41,7 +41,26 @@ async function createFromCsv(req, res, data) {
         }
     })
 
-    getBreakSchedule(employeeObjectArray)
+    
+
+
+    date = Date.now()
+    dateObject = Date.parse(date)
+    let fifteens = getFifteens(employeeObjectArray)
+    console.log(fifteens)
+    // let thirties = getThirties(employeeObjectArray)
+    let floaters = getFloaterCount(employeeObjectArray)
+    let breaks = getBreakSchedule(employeeObjectArray)
+
+    finalObject = {
+        date: dateObject,
+        totalFifteen: fifteens,
+        totalThirties: thirties,
+        totalBreakTime: "",
+        goalTime: "",
+        numFloaters: floaters,
+        breaks: breaks,
+    }
     employeeObjectArray.map((employeeObject) => {
         TimeSheet.create(employeeObject)
     })
