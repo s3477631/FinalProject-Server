@@ -43,13 +43,13 @@ async function createFromCsv(req, res, data) {
         }
     })
     //console.log(employeeObjectArray)
-    getBreakSchedule(employeeObjectArray)
+    res.send(getBreakSchedule(employeeObjectArray))
 
     employeeObjectArray.map((employeeObject) => {
         // console.log(employeeObject)
         TimeSheet.create(employeeObject)
     })
-    res.send(employeeObjectArray)
+ 
 }
 
 
