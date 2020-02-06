@@ -20,7 +20,7 @@ async function endtimes(req, res) {
     let endtime = new Date(time)
     let output = req.body
 //Find start time object 
- AnalysisSheet.find(output).then(response => response[0].endTapTime = endtime)
+ AnalysisSheet.find(output).then(response => res.send(response))
  
 
 }

@@ -69,7 +69,6 @@ async function createFromCsv(req, res, data) {
     employeeObjectArray.map((employeeObject) => {
         TimeSheet.create(employeeObject)
     })
-
     res.send(finalObject)
 }
 
