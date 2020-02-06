@@ -1,6 +1,5 @@
 const AnalysisSheet = require('../database/models/analysis_model')
 
-
 async function starttimes(req, res){ 
 //sends datetime object back to the client (to be stored in local storage)
 //axios post request from client responds with starttime
@@ -22,7 +21,6 @@ async function endtimes(req, res) {
     AnalysisSheet.find(starttimes).then(response => console.log(response))
 
 }
-
 
 module.exports = { 
     starttimes, 

@@ -10,5 +10,4 @@ router.post('/end', function(req, res){
     checkboxcontroller.endtimes(req, res)
 })
 
-
 module.exports = router
