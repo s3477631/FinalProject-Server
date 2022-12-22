@@ -28,7 +28,7 @@
     "forever": "^0.15.3",
     "formidable": "^1.2.1",
     "hh-mm-ss": "^1.2.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.15",
     "method-override": "^3.0.0",
     "mocha": "^7.0.1",
